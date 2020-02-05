@@ -19,16 +19,14 @@ public:
 	~FAcceptTask()
 	{
 		instance = nullptr;
-
 		UE_LOG(LogTemp, Warning, TEXT("AcceptTask Stop"));
-
 	}
 
 	void DoWork() 
 	{
 		if (!instance || instance->bIsAccepting == false) 
 		{
-			UE_LOG(LogTemp, Warning, TEXT("instance is invalid"));
+			UE_LOG(LogTemp, Warning, TEXT("instance is Invalid"));
 			return;
 		}
 
@@ -81,7 +79,6 @@ public:
 			instance->bIsAccept = false;
 		}
 	}
-
 
 	/*
 	Need this function
@@ -147,15 +144,13 @@ void UTCPSocketInstance::closeSoc()
 	}
 	if (AcceptTask) 
 	{
-		AcceptTask = nullptr;
 		bIsAccepting = false;
+		AcceptTask = nullptr;
 	}
 }
 
 FString UTCPSocketInstance::recvSoc() 
 {
-	//TODO recvUE4data is dirty
-	TSharedRef<FInternetAddr> targetAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 	TArray<uint8> ReceivedData;
 	uint32 Size;
 	if (SocketClient->HasPendingData(Size))
@@ -163,7 +158,7 @@ FString UTCPSocketInstance::recvSoc()
 		uint8 *Recv = new uint8[Size];
 		int32 BytesRead = 0;
 		ReceivedData.SetNumUninitialized(FMath::Min(Size, 65507u));
-		SocketClient->RecvFrom(ReceivedData.GetData(), ReceivedData.Num(), BytesRead, *targetAddr);
+		SocketClient->Recv(ReceivedData.GetData(), ReceivedData.Num(), BytesRead);
 		if (ReceivedData.Num() > 0)
 		{
 			FString ReceivedUE4String = StringFromBinaryArray(ReceivedData);
@@ -175,33 +170,10 @@ FString UTCPSocketInstance::recvSoc()
 
 FString UTCPSocketInstance::StringFromBinaryArray(TArray<uint8> BinaryArray)
 {
-	return FString(ANSI_TO_TCHAR(reinterpret_cast<const char*>(BinaryArray.GetData())));
+	BinaryArray.Add(0);// Add 0 termination. Even if the string is already 0-terminated, it doesn't change the results.
+	// Create a string from a byte array. The string is expected to be 0 terminated (i.e. a byte set to 0).
+	// Use UTF8_TO_TCHAR if needed.
+	// If you happen to know the data is UTF-16 (USC2) formatted, you do not need any conversion to begin with.
+	// Otherwise you might have to write your own conversion algorithm to convert between multilingual UTF-16 planes.
+	return FString(UTF8_TO_TCHAR(reinterpret_cast<const char*>(BinaryArray.GetData())));
 }
-
-
-
-/*
-// accept socket
-uint32 ipd;
-
-SocketClient = SocketServer->Accept(*addr, "aaa");
-addr->GetIp(ipd);
-
-char strTemp[20];
-sprintf(strTemp, "%d.%d.%d.%d",
-	(ipd & 0xff000000) >> 24,
-	(ipd & 0x00ff0000) >> 16,
-	(ipd & 0x0000ff00) >> 8,
-	(ipd & 0x000000ff));
-
-if (!SocketClient)
-{
-	UE_LOG(LogTemp, Warning, TEXT("accept ERROR"));
-	return false;
-}
-else
-{
-	UE_LOG(LogTemp, Warning, TEXT("IP:%s , Port:%d"), *FString(strTemp), addr->GetPort());
-	return true;
-}
-*/

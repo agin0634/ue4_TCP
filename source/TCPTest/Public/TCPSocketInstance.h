@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Runtime/Networking/Public/Networking.h"
-
 #include "Core/Public/Async/AsyncWork.h"
 #include "TCPSocketInstance.generated.h"
 
@@ -21,7 +20,6 @@ class TCPTEST_API UTCPSocketInstance : public UGameInstance
 	GENERATED_BODY()
 	
 public:
-
 	friend class FAcceptTask;
 
 	UFUNCTION(BlueprintCallable, Category = "TCPSocket")

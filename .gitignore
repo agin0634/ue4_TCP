@@ -5,6 +5,7 @@ DerivedDataCache/*
 Intermediate/*
 Binaries/*
 Saved/*
+Content/ParagonYin/*
 *.sdf
 *.suo
 *.pdb
